@@ -13,7 +13,7 @@ func SetupRouters(app *fiber.App, db *gorm.DB) {
 	app.Get("/locations", GetLocation)
 	app.Get("/location/:id", GetLocationByID)
 	app.Post("/location/add", AddLocation)
-	app.Patch("/location/update/:id", UpdateLocationByID)
+	app.Put("/location/:id", UpdateLocationByID)
 	app.Get("/locations/route", RouteLocation)
 
 }

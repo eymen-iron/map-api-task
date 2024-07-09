@@ -24,13 +24,22 @@ CREATE DATABASE IF NOT EXISTS `map-task` DEFAULT CHARACTER SET utf8mb3 COLLATE u
 USE `map-task`;
 
 DELIMITER $$
---
--- Procedures
---
+
 DROP PROCEDURE IF EXISTS `GetNearestLocationsWithPagination`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetNearestLocationsWithPagination` (IN `limit_count` INT, IN `offset_count` INT, IN `input_lat` FLOAT, IN `input_long` FLOAT)   BEGIN    
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetNearestLocationsWithPagination` (
+    IN `limit_count` INT,
+    IN `offset_count` INT,
+    IN `input_lat` FLOAT,
+    IN `input_long` FLOAT
+)
+-- Haversine formula   
+BEGIN    
     SELECT id, name, latitude, longitude, marker,
-           (6371 * acos(cos(radians(input_lat)) * cos(radians(latitude)) * cos(radians(longitude) - radians(input_long)) + sin(radians(input_lat)) * sin(radians(latitude)))) AS distance
+           6371 * 2 * ASIN(SQRT(
+               POWER(SIN((RADIANS(input_lat) - RADIANS(latitude)) / 2), 2) +
+               COS(RADIANS(input_lat)) * COS(RADIANS(latitude)) *
+               POWER(SIN((RADIANS(input_long) - RADIANS(longitude)) / 2), 2)
+           )) AS distance
     FROM locations
     ORDER BY distance
     LIMIT limit_count OFFSET offset_count;
@@ -68,10 +77,10 @@ TRUNCATE TABLE `locations`;
 --
 
 INSERT DELAYED IGNORE INTO `locations` (`id`, `name`, `latitude`, `longitude`, `marker`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(3, 'Anitakbir', 39.9304, 32.8541, 'white', '2024-07-09 15:34:39.484', '2024-07-09 15:34:39.484', NULL),
-(4, 'itu', 41.1053, 29.024, 'white', '2024-07-09 15:35:48.999', '2024-07-09 15:35:48.999', NULL),
-(5, 'ytu', 41.0432, 29.0096, 'white', '2024-07-09 15:36:33.263', '2024-07-09 15:36:33.263', NULL),
-(6, 'odtu', 39.8999, 32.7806, 'white', '2024-07-09 15:36:55.925', '2024-07-09 15:36:55.925', NULL);
+(1, 'Anitakbir', 39.9304, 32.8541, 'white', '2024-07-09 15:34:39.484', '2024-07-09 15:34:39.484', NULL),
+(2, 'itu', 41.1053, 29.024, 'white', '2024-07-09 15:35:48.999', '2024-07-09 15:35:48.999', NULL),
+(3, 'ytu', 41.0432, 29.0096, 'white', '2024-07-09 15:36:33.263', '2024-07-09 15:36:33.263', NULL),
+(4, 'odtu', 39.8999, 32.7806, 'white', '2024-07-09 15:36:55.925', '2024-07-09 15:36:55.925', NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

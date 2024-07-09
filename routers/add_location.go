@@ -15,25 +15,6 @@ func AddLocation(c *fiber.Ctx) error {
 	long := c.FormValue("long")
 	marker := c.FormValue("marker")
 
-	if name == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error":   true,
-			"message": "Please fill the name field",
-		})
-	} else if lat == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error":   true,
-			"message": "Please fill the lat field",
-		})
-	} else if long == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error":   true,
-			"message": "Please fill the long field",
-		})
-	} else if marker == "" {
-		marker = "red"
-	}
-
 	latFloat, err := strconv.ParseFloat(strings.TrimSpace(lat), 64)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -64,12 +45,12 @@ func AddLocation(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	result := DB.Create(&location)
 
+	result := DB.Create(&location)
 	if result.Error != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error":   true,
-			"message": "Something went wrong",
+			"message": "An error occurred while adding the location",
 		})
 	}
 

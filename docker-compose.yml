@@ -1,0 +1,35 @@
+version: '3.15'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Avlo1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./map-task.sql:/docker-entrypoint-initdb.d/map-task.sql
+    networks:
+      - backend
+
+  app:
+    build: .
+    restart: on-failure
+    ports:
+      - "1337:1337"
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: Avlo1234
+      DB_NAME: map-task
+    networks:
+      - backend
+
+networks:
+  backend:

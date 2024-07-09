@@ -14,7 +14,7 @@ func RouteLocation(c *fiber.Ctx) error {
 	longStr := c.Query("long")
 	latStr := c.Query("lat")
 	pageStr := c.Query("page")
-	limitStr := c.Query("size")
+	limitStr := c.Query("limit")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {

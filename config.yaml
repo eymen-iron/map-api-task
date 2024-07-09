@@ -2,5 +2,5 @@ DB:
   HOST: "localhost"
   PORT: "3306"
   USERNAME: "root"
-  PASWORD: "Avlo1234"
+  PASSWORD: "Avlo1234"
   NAME: "map-task"

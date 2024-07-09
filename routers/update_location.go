@@ -16,13 +16,6 @@ func UpdateLocationByID(c *fiber.Ctx) error {
 	lngStr := c.FormValue("lng")
 	marker := c.FormValue("marker")
 
-	if id == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error":   true,
-			"message": "id is required",
-		})
-	}
-
 	locationID, err := strconv.Atoi(id)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

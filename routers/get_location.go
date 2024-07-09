@@ -38,31 +38,19 @@ func GetLocation(c *fiber.Ctx) error {
 
 func GetLocationByID(c *fiber.Ctx) error {
 	idStr := c.Params("id")
-	pageStr := c.Query("page")
-	limitStr := c.Query("limit")
 
 	id, err := strconv.Atoi(idStr)
-
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid location ID"})
+	if err != nil || id < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Invalid location ID",
+		})
 	}
-
-	page, err := strconv.Atoi(pageStr)
-	if err != nil || page < 1 {
-		page = 1
-	}
-
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil || limit < 1 {
-		limit = 10000000
-	}
-
-	offset := (page - 1) * limit
 
 	var location models.Location
-	if err := DB.Offset(offset).Limit(limit).First(&location, id).Error; err != nil {
+	if err := DB.First(&location, id).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"success": false,
+			"error":   true,
 			"message": fmt.Sprintf("Database Error: %s", err.Error()),
 		})
 	}

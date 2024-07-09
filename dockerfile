@@ -10,9 +10,11 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -a -o service ./cmd/service 
+RUN go build -a -o service .
 
 FROM scratch AS final
+
+EXPOSE 1337
 
 COPY --from=build-env /src/service /service
 

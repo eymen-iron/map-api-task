@@ -2,37 +2,41 @@ package models
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func GetDB() (*gorm.DB, error) {
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
-	viper.SetConfigType("yml")
 
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file, %s", err)
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = "localhost"
 	}
-	DBPort, _ := viper.Get("DB.PORT").(string)
-	DBHost, _ := viper.Get("DB.HOST").(string)
-	DBUser, _ := viper.Get("DB.USERNAME").(string)
-	DBPass, _ := viper.Get("DB.PASWORD").(string)
-	DBName, _ := viper.Get("DB.NAME").(string)
 
-	config := DBConfig{
-		Host:     DBHost,
-		Port:     DBPort,
-		User:     DBUser,
-		Password: DBPass,
-		DB:       DBName,
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		port = "3306"
+	}
+
+	user := os.Getenv("DB_USER")
+	if user == "" {
+		user = "root"
+	}
+
+	password := os.Getenv("DB_PASS")
+	if password == "" {
+		password = "Avlo1234"
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		dbName = "map-task"
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.User, config.Password, config.Host, config.Port, config.DB)
+		user, password, host, port, dbName)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

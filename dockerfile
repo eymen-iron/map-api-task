@@ -1,13 +1,22 @@
-FROM golang:1.22
+FROM golang:1.22-bookworm AS build-env
 
-WORKDIR /usr/src/app
+WORKDIR /src
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
+ENV CGO_ENABLED=0
+
 COPY go.mod go.sum ./
+
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o /usr/local/bin/app ./...
 
-EXPOSE 1337
-CMD ["app"]
+RUN go build -a -o service ./cmd/service 
+
+FROM scratch AS final
+
+COPY --from=build-env /src/service /service
+
+COPY --from=build-env /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=build-env /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+ENTRYPOINT ["/service"]

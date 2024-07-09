@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/eymen-iron/map-api-task/models"
+	"github.com/eymen-iron/map-api-task/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -49,11 +50,13 @@ func RouteLocation(c *fiber.Ctx) error {
 			"message": "Please fill the long field correctly",
 		})
 	}
+
 	l := models.Location{
 		Latitude:  latFloat,
 		Longitude: longFloat,
 	}
-	if err := Validate(l); err != nil {
+
+	if err := utils.Validate(l); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error":   true,
 			"message": err.Error(),

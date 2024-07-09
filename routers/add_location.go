@@ -5,16 +5,9 @@ import (
 	"strings"
 
 	"github.com/eymen-iron/map-api-task/models"
-	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/eymen-iron/map-api-task/utils"
 	"github.com/gofiber/fiber/v2"
 )
-
-func Validate(l models.Location) error {
-	return validation.ValidateStruct(&l,
-		validation.Field(&l.Latitude, validation.Required, validation.Min(-90.0), validation.Max(90.0)),
-		validation.Field(&l.Longitude, validation.Required, validation.Min(-180.0), validation.Max(180.0)),
-	)
-}
 
 func AddLocation(c *fiber.Ctx) error {
 	name := c.FormValue("name")
@@ -38,8 +31,9 @@ func AddLocation(c *fiber.Ctx) error {
 			"message": "Please fill the long field",
 		})
 	} else if marker == "" {
-		marker = "white"
+		marker = "red"
 	}
+
 	latFloat, err := strconv.ParseFloat(strings.TrimSpace(lat), 64)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -48,6 +42,7 @@ func AddLocation(c *fiber.Ctx) error {
 		})
 
 	}
+
 	longFloat, err := strconv.ParseFloat(strings.TrimSpace(long), 64)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -55,13 +50,15 @@ func AddLocation(c *fiber.Ctx) error {
 			"message": "Please fill the long field correctly",
 		})
 	}
+
 	location := models.Location{
 		Name:      name,
 		Latitude:  latFloat,
 		Longitude: longFloat,
 		Marker:    marker,
 	}
-	if err := Validate(location); err != nil {
+
+	if err := utils.Validate(location); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error":   true,
 			"message": err.Error(),
